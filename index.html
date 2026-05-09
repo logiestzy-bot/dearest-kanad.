@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>birthday ♡</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Nunito:wght@400;600;700&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#fff7fb;
+  overflow:hidden;
+  font-family:'Nunito', sans-serif;
+}
+
+/* SPRINKLES */
+.sprinkle{
+  position:absolute;
+  width:6px;
+  height:16px;
+  border-radius:10px;
+  opacity:.7;
+  z-index:0;
+}
+
+/* SCREEN */
+.screen{
+  position:absolute;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.active{
+  display:flex;
+}
+
+/* FADE */
+.fade{
+  animation:fade .5s ease;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* FLOAT */
+.float{
+  animation:float 1.8s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%{
+    transform:translateY(0);
+  }
+
+  50%{
+    transform:translateY(-6px);
+  }
+
+  100%{
+    transform:translateY(0);
+  }
+}
+
+/* LOADING */
+.card{
+  background:#fff;
+  padding:30px;
+  border-radius:25px;
+  text-align:center;
+  border:3px solid #ffd6e5;
+  z-index:2;
+}
+
+.title{
+  font-family:'Darumadrop One';
+  font-size:40px;
+  color:#ff8fb1;
+}
+
+.bar{
+  width:220px;
+  height:20px;
+  background:#ffe4ee;
+  border-radius:50px;
+  margin-top:15px;
+  overflow:hidden;
+}
+
+.fill{
+  width:0%;
+  height:100%;
+  background:#ffb7cf;
+  transition:1s;
+}
+
+/* TAP TEXT */
+.tapText{
+  margin-top:14px;
+  color:#ff9cbc;
+  font-size:14px;
+  letter-spacing:2px;
+}
+
+/* PHONE */
+.phone{
+  width:300px;
+  background:#ffc1d6;
+  border-radius:40px;
+  padding:20px;
+  border:5px solid #ff8fb1;
+  z-index:2;
+}
+
+.screenBox{
+  height:170px;
+  background:#fff;
+  border-radius:25px;
+  border:4px solid #ffd8e7;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+
+.passWrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  transition:.3s;
+}
+
+.passTop{
+  color:#ff8fb1;
+  font-size:18px;
+  font-weight:700;
+}
+
+.passBottom{
+  color:#ff8fb1;
+  font-size:20px;
+  font-family:'Darumadrop One';
+}
+
+.pass{
+  position:absolute;
+  color:#ff8fb1;
+  letter-spacing:8px;
+  font-size:30px;
+  font-weight:700;
+  opacity:0;
+  transition:.5s ease;
+}
+
+.pass.show{
+  opacity:1;
+}
+
+.hide{
+  opacity:0;
+}
+
+/* KEYPAD */
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:15px;
+}
+
+.key{
+  height:50px;
+  border:none;
+  border-radius:12px;
+  background:#fff;
+  color:#ff8fb1;
+  font-weight:700;
+  font-size:18px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.key:hover{
+  transform:scale(1.05);
+}
+
+/* CAKE */
+.cakeArea{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  z-index:2;
+}
+
+.topCake{
+  width:180px;
+  height:95px;
+  background:#ffc8da;
+  border:5px solid #ff8fb1;
+  border-radius:25px;
+  position:relative;
+  z-index:2;
+  margin-bottom:-10px;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.num{
+  width:100%;
+  text-align:center;
+  font-size:78px;
+  color:#fff;
+  font-family:'Darumadrop One';
+  text-shadow:0 0 10px #ff9fc0;
+  position:relative;
+  left:-2px;
+}
+
+.bottomCake{
+  width:320px;
+  height:180px;
+  background:#ffbdd4;
+  border:5px solid #ff8fb1;
+  border-radius:30px;
+  position:relative;
+  z-index:1;
+}
+
+/* CANDLES */
+.candles{
+  position:absolute;
+  top:-60px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  gap:50px;
+  z-index:5;
+}
+
+.candle{
+  width:18px;
+  height:70px;
+  background:#ff8fb1;
+  border-radius:10px;
+  position:relative;
+  cursor:pointer;
+  box-shadow:0 0 10px #ff9ec1;
+}
+
+.flame{
+  width:18px;
+  height:18px;
+  background:#ffd166;
+  border-radius:50%;
+  position:absolute;
+  top:-16px;
+
+  animation:flicker .8s infinite alternate;
+
+  box-shadow:
+    0 0 10px #ffd166,
+    0 0 20px #ffef99,
+    0 0 30px #fff3b0;
+}
+
+@keyframes flicker{
+  from{
+    transform:scale(1);
+    opacity:1;
+  }
+
+  to{
+    transform:scale(1.15) translateY(-2px);
+    opacity:.8;
+  }
+}
+
+/* TEXT */
+.text{
+  width:100%;
+  text-align:center;
+  position:absolute;
+  top:58px;
+  left:0;
+  color:#fff;
+  font-family:'Darumadrop One';
+  font-size:31px;
+  line-height:1.3;
+}
+
+/* HINT */
+.candleHint{
+  position:absolute;
+  bottom:18px;
+  width:100%;
+  text-align:center;
+  color:#fff;
+  font-size:13px;
+  letter-spacing:1px;
+}
+
+/* PLATE */
+.plate{
+  width:360px;
+  height:28px;
+  background:#ffd8e7;
+  border-radius:40px;
+  margin-top:-2px;
+  border:4px solid #ffc1d6;
+}
+
+/* CREDIT */
+.credit{
+  position:fixed;
+  bottom:12px;
+  left:50%;
+  transform:translateX(-50%);
+
+  color:#ff8fb1;
+  font-size:13px;
+  font-weight:700;
+
+  z-index:9999;
+
+  background:rgba(255,255,255,.55);
+  padding:6px 12px;
+  border-radius:20px;
+
+  backdrop-filter:blur(6px);
+
+  box-shadow:0 0 10px rgba(255,255,255,.5);
+
+  pointer-events:none;
+}
+
+/* POPUP */
+.popup{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#fff;
+  border-radius:25px;
+  padding:25px;
+  text-align:center;
+  border:3px dashed #ffbfd5;
+  z-index:99;
+  animation:fade .3s ease;
+  min-width:260px;
+}
+
+.popup h1{
+  font-family:'Darumadrop One';
+  color:#ff8fb1;
+  margin-bottom:10px;
+}
+
+.ps{
+  font-size:12px;
+  color:#ff9cbc;
+  margin-bottom:15px;
+}
+
+.tabs{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.tab{
+  padding:8px 12px;
+  background:#ffbdd4;
+  border:none;
+  border-radius:12px;
+  color:#fff;
+  font-size:12px;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SPRINKLES -->
+<script>
+for(let i=0;i<80;i++){
+
+  const s=document.createElement("div");
+
+  s.className="sprinkle";
+
+  s.style.left=Math.random()*100+"%";
+  s.style.top=Math.random()*100+"%";
+
+  const c=[
+    "#ff8fb1",
+    "#ffd1dc",
+    "#cdb4ff",
+    "#fff1a8"
+  ];
+
+  s.style.background=
+  c[Math.floor(Math.random()*c.length)];
+
+  document.body.appendChild(s);
+}
+</script>
+
+<!-- LOADING -->
+<div id="loading" class="screen active">
+
+  <div class="card float">
+
+    <div class="title">
+      loading . .
+    </div>
+
+    <div class="bar">
+      <div class="fill" id="fill"></div>
+    </div>
+
+    <div class="tapText">
+      ♡ tap me ♡
+    </div>
+
+  </div>
+
+</div>
+
+<!-- PHONE -->
+<div id="phone" class="screen">
+
+  <div class="phone fade">
+
+    <div class="screenBox">
+
+      <div class="passWrap" id="passWrap">
+
+        <div class="passTop">
+          passcode:
+        </div>
+
+        <div class="passBottom">
+          your birthday!
+        </div>
+
+      </div>
+
+      <div class="pass" id="display"></div>
+
+    </div>
+
+    <div class="keypad">
+
+      <button class="key" onclick="tap(1)">1</button>
+      <button class="key" onclick="tap(2)">2</button>
+      <button class="key" onclick="tap(3)">3</button>
+
+      <button class="key" onclick="tap(4)">4</button>
+      <button class="key" onclick="tap(5)">5</button>
+      <button class="key" onclick="tap(6)">6</button>
+
+      <button class="key" onclick="tap(7)">7</button>
+      <button class="key" onclick="tap(8)">8</button>
+      <button class="key" onclick="tap(9)">9</button>
+
+      <button class="key" onclick="clearP()">x</button>
+      <button class="key" onclick="tap(0)">0</button>
+      <button class="key" onclick="check()">♡</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- CAKE -->
+<div id="cake" class="screen">
+
+  <div class="cakeArea fade">
+
+    <div class="topCake">
+
+      <div class="candles">
+
+        <div class="candle"
+        onclick="coupon(
+        'hug coupon',
+        'hi! you owe me a hug coupon :3'
+        )">
+          <div class="flame"></div>
+        </div>
+
+        <div class="candle"
+        onclick="coupon(
+        'compliment coupon',
+        'hi! you owe me a compliment coupon :3'
+        )">
+          <div class="flame"></div>
+        </div>
+
+        <div class="candle"
+        onclick="coupon(
+        'love coupon',
+        'hi! you owe me a love coupon :3'
+        )">
+          <div class="flame"></div>
+        </div>
+
+      </div>
+
+      <div class="num">20</div>
+
+    </div>
+
+    <div class="bottomCake">
+
+      <div class="text">
+        happy birthday
+      </div>
+
+      <div class="candleHint">
+        (tap the candles)
+      </div>
+
+    </div>
+
+    <div class="plate"></div>
+
+  </div>
+
+</div>
+
+<!-- CREDIT -->
+<div class="credit">
+  made with love, gigi. ♡
+</div>
+
+<script>
+
+let pass="";
+
+/* CHANGE SCREEN */
+function show(id){
+
+  document
+  .querySelectorAll(".screen")
+  .forEach(s=>s.classList.remove("active"));
+
+  document
+  .getElementById(id)
+  .classList.add("active");
+}
+
+/* LOADING */
+document
+.getElementById("loading")
+.onclick=()=>{
+
+  document
+  .getElementById("fill")
+  .style.width="100%";
+
+  setTimeout(()=>{
+    show("phone");
+  },1200);
+}
+
+/* INPUT */
+function tap(n){
+
+  const display=
+  document.getElementById("display");
+
+  const wrap=
+  document.getElementById("passWrap");
+
+  if(pass.length===0){
+
+    wrap.classList.add("hide");
+
+    setTimeout(()=>{
+      wrap.style.display="none";
+      display.classList.add("show");
+    },250);
+  }
+
+  if(pass.length<6){
+    pass+=n;
+  }
+
+  display.innerText=pass;
+}
+
+function clearP(){
+
+  pass="";
+
+  const display=
+  document.getElementById("display");
+
+  const wrap=
+  document.getElementById("passWrap");
+
+  display.innerText="";
+  display.classList.remove("show");
+
+  wrap.style.display="flex";
+
+  setTimeout(()=>{
+    wrap.classList.remove("hide");
+  },10);
+}
+
+function check(){
+
+  if(pass==="290506"){
+
+    show("cake");
+
+    confetti({
+      particleCount:220,
+      spread:120
+    });
+
+  }else{
+
+    clearP();
+
+    alert("wrong passcode ♡");
+  }
+}
+
+/* COUPON */
+function coupon(title,message){
+
+  const pop=document.createElement("div");
+
+  pop.className="popup";
+
+  pop.innerHTML=`
+
+    <h1>${title}</h1>
+
+    <div class="ps">
+      p.s. text me to claim your coupon :P
+    </div>
+
+    <div class="tabs">
+
+      <button class="tab"
+      onclick="this.parentElement.parentElement.remove()">
+      close
+      </button>
+
+      <button class="tab"
+      onclick="
+      window.open(
+      'https://wa.me/6281806463610?text='
+      + encodeURIComponent('${message}')
+      )
+      ">
+      text me
+      </button>
+
+    </div>
+  `;
+
+  document.body.appendChild(pop);
+
+  confetti({
+    particleCount:120,
+    spread:80
+  });
+}
+
+</script>
+
+</body>
+</html>
